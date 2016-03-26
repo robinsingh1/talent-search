@@ -26,7 +26,7 @@ const reqLimiter = (req, res, next) => {
       return res.status(HTTPStatus.FORBIDDEN).json({
         error: true,
         msg: 'Your account has run out of requests'
-      })
+      });
     }
 
     next();

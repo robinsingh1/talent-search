@@ -107,6 +107,7 @@
     "bookshelf": "^0.9.2",
     "compression": "^1.6.0",
     "express": "^4.13.3",
+    "express-jwt": "^3.3.0",
     "express-session": "^1.12.1",
     "file-loader": "^0.8.5",
     "hoist-non-react-statics": "^1.0.3",

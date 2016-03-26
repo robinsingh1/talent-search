@@ -8,6 +8,7 @@ import PrettyError from 'pretty-error';
 import http from 'http';
 import SocketIo from 'socket.io';
 import Bookshelf from './config/bookshelf';
+import jwt from 'express-jwt';
 import reqLimiter from './middlewares/reqLimiter';
 
 const pretty = new PrettyError();
@@ -18,15 +19,22 @@ const server = new http.Server(app);
 const io = new SocketIo(server);
 io.path('/ws');
 
-app.use(session({
-  secret: 'react and redux rule!!!!',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 60000 }
-}));
+// app.use(session({
+//   secret: 'react and redux rule!!!!',
+//   resave: false,
+//   saveUninitialized: false,
+//   cookie: { maxAge: 60000 }
+// }));
 app.use(bodyParser.json());
 
-app.use(reqLimiter);
+// Protect all routes except `/auth`
+app.use('/', jwt({
+  secret: 'SECRET'
+}).unless({path:[new RegExp('/auth/.*')]}));
+
+// Request limit on /protected routes
+// app.use('/protected', reqLimiter);
+// app.use(reqLimiter);
 
 app.use((req, res) => {
   const splittedUrlPath = req.url.split('?')[0].split('/').slice(1);
