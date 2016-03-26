@@ -1,4 +1,4 @@
-import User from '../models/user.js';
+import User from '../../models/user.js';
 
 export default function login(req) {
   const email = req.body.email;
