@@ -8,6 +8,7 @@ import PrettyError from 'pretty-error';
 import http from 'http';
 import SocketIo from 'socket.io';
 import Bookshelf from './config/bookshelf';
+import reqLimiter from './middlewares/reqLimiter';
 
 const pretty = new PrettyError();
 const app = express();
@@ -25,9 +26,7 @@ app.use(session({
 }));
 app.use(bodyParser.json());
 
-// Setup DB
-app.set('bookshelf', Bookshelf)
-
+app.use(reqLimiter);
 
 app.use((req, res) => {
   const splittedUrlPath = req.url.split('?')[0].split('/').slice(1);
