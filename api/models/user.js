@@ -23,6 +23,10 @@ const User = Bookshelf.Model.extend({
                .withPivot(['active', 'updated_at']);
   },
 
+  remainingRequests: function() {
+    return redis.getAsync('user:'+this.get('id')+':limit');
+  },
+
   // Assign a payment plan to user.
   assignPlan: function(plan) {
     var self = this;
@@ -42,6 +46,7 @@ const User = Bookshelf.Model.extend({
         });
       })
       .then(function(){
+        // attach target plan
         return self.currentPlan().attach({
           plan_id: plan.id,
           active: true,

@@ -1,8 +1,19 @@
+import User from '../models/user.js';
+
 export default function loadInfo() {
-  return new Promise((resolve) => {
-    resolve({
-      message: 'This came from the api server',
-      time: Date.now()
-    });
-  });
+  return User.forge({id: 44}).fetch().then( user => {
+    return user.remainingRequests();
+  })
+  .then( res => {
+    return Promise.resolve({
+      error: false,
+      remaining: res
+    })
+  })
+  .catch( err => {
+    return Promise.reject({
+      error: true,
+      msg: err.message
+    })
+  })
 }
