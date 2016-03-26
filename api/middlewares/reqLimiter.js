@@ -3,10 +3,6 @@ import moment from 'moment';
 import HTTPStatus from 'http-status';
 
 const reqLimiter = (req, res, next) => {
-  req.user = {
-    id: 44
-  }
-
   // save this payload in the user requests sorted list.
   const payload = JSON.stringify({
     url: req.url,
