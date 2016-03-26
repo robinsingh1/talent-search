@@ -1,8 +1,8 @@
 import User from '../models/user.js';
 
 export default function signup(req) {
-  var email = req.body.email;
-  var password = req.body.password;
+  const email = req.body.email;
+  const password = req.body.password;
 
   if(!email || !password) {
     return Promise.reject({

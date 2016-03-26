@@ -3,7 +3,8 @@ require('babel-polyfill');
 const environment = {
   development: {
     isProduction: false,
-    pgconn: 'postgres://caL_@localhost/talentdb'
+    pgconn: 'postgres://caL_@localhost/talentdb',
+    redisconn: 'redis://:@localhost:6379'
   },
   production: {
     isProduction: true
@@ -37,5 +38,6 @@ module.exports = Object.assign({
     }
   },
   pgconn: process.env.DATABASE_URL,
+  redisconn: process.env.REDISCLOUD_URL
 
 }, environment);
