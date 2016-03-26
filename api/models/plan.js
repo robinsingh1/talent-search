@@ -24,6 +24,6 @@ const Plan = Bookshelf.Model.extend({
     id: 1,
     name: 'Trial'
   }
-})
+});
 
 export default Plan;

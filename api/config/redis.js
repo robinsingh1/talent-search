@@ -6,14 +6,14 @@ import bluebird from 'bluebird';
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
-var client = redis.createClient(config.redisconn || process.env.REDISCLOUD_URL, {no_ready_check: true});
+const client = redis.createClient(config.redisconn || process.env.REDISCLOUD_URL, {no_ready_check: true});
 
-client.on('error', function(err){
-    console.log('Error '+err);
+client.on('error', (err) => {
+  console.log(`Error ${err}`);
 });
 
-client.on('connect', function() {
-    console.log('Connected to Redis');
+client.on('connect', () => {
+  console.log('Connected to Redis');
 });
 
 export default client;

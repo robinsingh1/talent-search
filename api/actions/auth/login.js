@@ -10,12 +10,12 @@ export default function login(req) {
       error: false,
       user: user,
       token: user.generateJWT()
-    })
+    });
   })
   .catch( err => {
     return Promise.reject({
       error: true,
       msg: err.message
     });
-  })
+  });
 }

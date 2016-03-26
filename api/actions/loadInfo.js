@@ -8,12 +8,12 @@ export default function loadInfo(req) {
     return Promise.resolve({
       error: false,
       remaining: res
-    })
+    });
   })
   .catch( err => {
     return Promise.reject({
       error: true,
       msg: err.message
-    })
-  })
+    });
+  });
 }

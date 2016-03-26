@@ -21,20 +21,18 @@ const reqLimiter = (req, res, next) => {
   .execAsync()
   .then( results => {
     const remaining = results[0];
-    if(remaining <= 0) {
+    if (remaining <= 0) {
       // No more requests available for this user.
       return res.status(HTTPStatus.FORBIDDEN).json({
         error: true,
         msg: 'Your account has run out of requests'
       });
     }
-
     next();
-
   })
   .catch( err => {
     console.log(err.message);
-  })
-}
+  });
+};
 
 export default reqLimiter;

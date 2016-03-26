@@ -1,5 +1,4 @@
 import express from 'express';
-import session from 'express-session';
 import bodyParser from 'body-parser';
 import config from '../src/config';
 import * as actions from './actions/index';
@@ -7,7 +6,6 @@ import {mapUrl} from 'utils/url.js';
 import PrettyError from 'pretty-error';
 import http from 'http';
 import SocketIo from 'socket.io';
-import Bookshelf from './config/bookshelf';
 import jwt from 'express-jwt';
 import reqLimiter from './middlewares/reqLimiter';
 
@@ -19,18 +17,12 @@ const server = new http.Server(app);
 const io = new SocketIo(server);
 io.path('/ws');
 
-// app.use(session({
-//   secret: 'react and redux rule!!!!',
-//   resave: false,
-//   saveUninitialized: false,
-//   cookie: { maxAge: 60000 }
-// }));
 app.use(bodyParser.json());
 
 // Protect all routes except `/auth`
 app.use('/', jwt({
   secret: 'SECRET'
-}).unless({path:[new RegExp('/auth/.*')]}));
+}).unless({ path: [new RegExp('/auth/.*')] }));
 
 // Request limit on /protected routes
 app.use('/test', reqLimiter);
@@ -66,13 +58,13 @@ app.use((req, res) => {
 // development error handler
 // will print stacktrace
 if (config.env === 'development') {
-
   app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.json({
-        message: err.message,
-        error: err
+      message: err.message,
+      error: err
     });
+    next();
   });
 }
 
@@ -83,8 +75,9 @@ app.use((err, req, res, next) => {
   res.json({
     message: err.message,
     error: {}
-  })
-})
+  });
+  next();
+});
 
 
 const bufferSize = 100;

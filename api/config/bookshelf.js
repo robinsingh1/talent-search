@@ -4,7 +4,7 @@ import config from '../../src/config';
 
 const dbConfig = {
   client: 'postgresql',
-	connection: config.pgconn,
+  connection: config.pgconn,
   pool: {
     min: 2,
     max: 10
