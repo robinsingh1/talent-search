@@ -33,7 +33,7 @@ app.use('/', jwt({
 }).unless({path:[new RegExp('/auth/.*')]}));
 
 // Request limit on /protected routes
-// app.use('/protected', reqLimiter);
+app.use('/test', reqLimiter);
 // app.use(reqLimiter);
 
 app.use((req, res) => {

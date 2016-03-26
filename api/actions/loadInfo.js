@@ -1,7 +1,7 @@
 import User from '../models/user.js';
 
-export default function loadInfo() {
-  return User.forge({id: 44}).fetch().then( user => {
+export default function loadInfo(req) {
+  return User.forge({id: req.user.id}).fetch({require: true}).then( user => {
     return user.remainingRequests();
   })
   .then( res => {

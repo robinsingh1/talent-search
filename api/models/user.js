@@ -72,7 +72,7 @@ const User = Bookshelf.Model.extend({
 
 
     return jwt.sign({
-      _id: this.id,
+      id: this.id,
       email: this.email,
       exp: parseInt(exp.getTime() / 1000),
     }, 'SECRET')
