@@ -54,6 +54,30 @@ app.use((req, res) => {
   }
 });
 
+/** Error Handling */
+// development error handler
+// will print stacktrace
+if (config.env === 'development') {
+
+  app.use((err, req, res, next) => {
+    res.status(err.status || 500);
+    res.json({
+        message: err.message,
+        error: err
+    });
+  });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use((err, req, res, next) => {
+  res.status(err.status || 500);
+  res.json({
+    message: err.message,
+    error: {}
+  })
+})
+
 
 const bufferSize = 100;
 const messageBuffer = new Array(bufferSize);
