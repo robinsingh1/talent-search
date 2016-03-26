@@ -1,7 +1,9 @@
 import Promise from 'bluebird';
-import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import Bookshelf from '../config/bookshelf';
 import Plan from './plan';
+
+const bcrypt = Promise.promisifyAll(require('bcrypt'));
 
 const User = Bookshelf.Model.extend({
   tableName: 'users',
@@ -19,6 +21,19 @@ const User = Bookshelf.Model.extend({
                .query({where: {active: true}});
   },
 
+  generateJWT: function() {
+    const today = new Date();
+    const exp = new Date(today);
+    // set expiration 60 days
+    exp.setDate(today.getDate() + 60);
+
+    return jwt.sign({
+      _id: this.id,
+      email: this.email,
+      exp: parseInt(exp.getTime() / 1000),
+    }, 'SECRET')
+  },
+
 }, {
 
   login: Promise.method(function(email, password) {
@@ -26,13 +41,12 @@ const User = Bookshelf.Model.extend({
 
     return new this({email: email.toLowerCase().trim()}).fetch({require: true})
       .tap((customer) => {
-        return bcrypt.compareAsync(customer.get('password'), password)
+        return bcrypt.compareAsync(password, customer.get('password'))
           .then((res) => {
             if (!res) throw new Error('Invalid password');
           })
       })
   }),
-
 
   register: Promise.method(function(email, password) {
     if(!email || !password) throw new Error('Email and password both required');
