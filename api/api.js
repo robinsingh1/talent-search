@@ -7,6 +7,7 @@ import {mapUrl} from 'utils/url.js';
 import PrettyError from 'pretty-error';
 import http from 'http';
 import SocketIo from 'socket.io';
+import Bookshelf from './config/bookshelf';
 
 const pretty = new PrettyError();
 const app = express();
@@ -23,6 +24,9 @@ app.use(session({
   cookie: { maxAge: 60000 }
 }));
 app.use(bodyParser.json());
+
+// Setup DB
+app.set('bookshelf', Bookshelf)
 
 
 app.use((req, res) => {
