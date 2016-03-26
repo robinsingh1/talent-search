@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import jwt from 'jsonwebtoken';
 import Bookshelf from '../config/bookshelf';
+import redis from '../config/redis';
 import Plan from './plan';
 
 const bcrypt = Promise.promisifyAll(require('bcrypt'));
@@ -18,7 +19,44 @@ const User = Bookshelf.Model.extend({
 
   currentPlan: function() {
     return this.belongsToMany(Plan, 'users_plans', 'user_id', 'plan_id')
-               .query({where: {active: true}});
+               .query({where: {active: true}})
+               .withPivot(['active', 'updated_at']);
+  },
+
+  // Assign a payment plan to user.
+  assignPlan: function(plan) {
+    var self = this;
+    return this.currentPlan().fetchOne()
+      .then(function(_plan){
+        if(_plan) {
+          // verify plan is not same as current plan
+          if(_plan.get('id') === plan.id) {
+            throw new Error('Already on plan: '+ _plan.name);
+          }
+        }
+
+        // Deactivate current plan
+        return self.currentPlan().updatePivot({
+          active: false,
+          updated_at: new Date()
+        });
+      })
+      .then(function(){
+        return self.currentPlan().attach({
+          plan_id: plan.id,
+          active: true,
+          created_at: new Date(),
+          updated_at: new Date()
+        });
+      })
+      .then(function(){
+        // Get limit on plan and assign to redis keys
+        return new Plan({id: plan.id}).fetch()
+      })
+      .then(function(plan){
+        var limit = plan.get('request_limit');
+        return redis.setAsync('user:'+self.get('id')+':limit', limit);
+      });
   },
 
   generateJWT: function() {
@@ -27,6 +65,7 @@ const User = Bookshelf.Model.extend({
     // set expiration 60 days
     exp.setDate(today.getDate() + 60);
 
+
     return jwt.sign({
       _id: this.id,
       email: this.email,
@@ -34,14 +73,15 @@ const User = Bookshelf.Model.extend({
     }, 'SECRET')
   },
 
+
 }, {
 
   login: Promise.method(function(email, password) {
     if(!email || !password) throw new Error('Email and password both required');
 
     return new this({email: email.toLowerCase().trim()}).fetch({require: true})
-      .tap((customer) => {
-        return bcrypt.compareAsync(password, customer.get('password'))
+      .tap((user) => {
+        return bcrypt.compareAsync(password, user.get('password'))
           .then((res) => {
             if (!res) throw new Error('Invalid password');
           })
@@ -65,12 +105,7 @@ const User = Bookshelf.Model.extend({
       })
       .then((user) => {
         // Assign Trial Plan
-        return user.currentPlan().attach({
-          plan_id: Plan.trial.id,
-          active: true,
-          created_at: new Date(),
-          updated_at: new Date()
-        });
+        return user.assignPlan(Plan.trial);
       })
   })
 
