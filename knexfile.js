@@ -1,10 +1,11 @@
 // Update with your config settings.
+var config = require('./src/config');
 
 module.exports = {
 
   development: {
     client: 'postgresql',
-    connection: 'postgres://caL_@localhost/talentdb',
+    connection: config.pgconn,
     pool: {
       min: 0,
       max: 10,
